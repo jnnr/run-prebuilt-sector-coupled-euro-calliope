@@ -1,0 +1,8 @@
+.snakemake/
+build/
+*.log
+2022-02-08.zip
+README.md
+create_input.py
+run.py
+requirements.yml
