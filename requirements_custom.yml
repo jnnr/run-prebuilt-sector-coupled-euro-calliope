@@ -1,0 +1,8 @@
+name: eurocalliope_2022_02_08
+channels:
+    - conda-forge
+    - gurobi
+dependencies:
+    - python=3.8
+    - gurobi=9.5
+    - calliope=0.6.8
