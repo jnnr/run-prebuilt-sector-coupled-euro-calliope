@@ -6,9 +6,13 @@ First, create a conda environment with
 
     conda env create -f requirements_custom.yml
 
+And activate it
+
+    conda activate eurocalliope_2022_02_08
+
 Then, download and unzip the pre-built models by running 
 
-    snakemake --use-conda --profile default build
+    snakemake --use-conda --profile default build/pre-built
 
 Then, to build an run a model, e.g.
 
