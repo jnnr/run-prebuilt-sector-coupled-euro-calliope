@@ -9,6 +9,11 @@ rule download_pre_built:
     output: directory("build/pre-built")
     shell: "curl -sLo '2022-02-08.zip' 'https://surfdrive.surf.nl/files/index.php/s/6TDxlPxkKR79sHy/download'; unzip '2022-02-08.zip'; rm -r 2022-02-08.zip; mv 2022-02-08/* .; rm -r 2022-02-08; unzip 2050.zip -d build/pre-built; rm -r 2030.zip 2050.zip"
 
+rule rearrange_files:
+    message: "Rearrange files"
+    input: "build/pre-built"
+    output: directory("build/pre-built-rearranged")
+    script: "rearrange_files.py"
 
 # TODO: this is another build phase, applying overrides
 rule build_eurocalliope:
