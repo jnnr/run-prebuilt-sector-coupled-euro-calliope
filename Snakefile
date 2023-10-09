@@ -13,6 +13,7 @@ rule download_pre_built:
 # TODO: this is another build phase, applying overrides
 rule build_eurocalliope:
     #message: "Building Calliope {wildcards.resolution} model with {wildcards.model_resolution} hourly temporal resolution for the model year {wildcards.year}"
+    conda: "requirements_custom.yml"
     input:
         prebuild = "build/pre-built",
         script="create_input_custom.py",
@@ -27,6 +28,7 @@ rule build_eurocalliope:
 
 rule run_eurocalliope:
     # message: "Running Calliope {wildcards.resolution} model with {wildcards.model_resolution} hourly temporal resolution for the model year {wildcards.year}"
+    conda: "requirements_custom.yml"
     input:
         model = rules.build_eurocalliope.output[0],
         script = "run_custom.py"
