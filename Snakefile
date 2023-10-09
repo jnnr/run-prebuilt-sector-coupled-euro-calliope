@@ -15,21 +15,23 @@ rule build_eurocalliope:
     #message: "Building Calliope {wildcards.resolution} model with {wildcards.model_resolution} hourly temporal resolution for the model year {wildcards.year}"
     input:
         prebuild = "build/pre-built",
+        script="create_input_custom.py",
     params:
-        model_yaml_path = "build/pre-built/model/{resolution}/model-{year}.yaml",
+        model_yaml_path = "model/{resolution}/model-{year}.yaml",
         # scenario according to https://energysystems-docs.netlify.app/tools/sector-coupled-euro-calliope-hands-on.html
         scenario = "industry_fuel,transport,heat,config_overrides,gas_storage,link_cap_dynamic,freeze-hydro-capacities,add-biofuel,synfuel_transmission,{model_resolution}",
     output: "build/{resolution}/inputs/{year}_{model_resolution}.nc"
     log: LOGS + "build_eurocalliope_{resolution}_{year}_{model_resolution}.log"
     # conda: "../envs/calliope.yaml"
-    shell: "python create_input_custom.py -i {params.model_yaml_path} -o {output} --scenario {params.scenario} 2> {log}"
-
+    shell: "python {input.script} -i {input.prebuild}/{params.model_yaml_path} -o {output} --scenario {params.scenario} 2> {log}"
 
 rule run_eurocalliope:
     # message: "Running Calliope {wildcards.resolution} model with {wildcards.model_resolution} hourly temporal resolution for the model year {wildcards.year}"
-    input: model = rules.build_eurocalliope.output[0]
+    input:
+        model = rules.build_eurocalliope.output[0],
+        script = "run_custom.py"
     envmodules: "gurobi/9.0.2"
     output: "build/{resolution}/outputs/{year}_{model_resolution}.nc"
     log: LOGS + "run_eurocalliope_{resolution}_{year}_{model_resolution}.log"
     # conda: "../envs/calliope.yaml"
-    shell: "python run_custom.py -i {input.model} -o {output} 2> {log} 1> {log}"
+    shell: "python {input.script} -i {input.model} -o {output} 2> {log} 1> {log}"
