@@ -7,10 +7,15 @@ configfile: "config/default.yaml"
 # TODO: This rule can move to euro-calliope and become part of the switch between downloading/self-generating
 rule download_pre_built:
     message: "Download and unzip prebuild"
-    params: url="https://surfdrive.surf.nl/files/index.php/s/6TDxlPxkKR79sHy/download"
+    params:
+        url="https://surfdrive.surf.nl/files/index.php/s/6TDxlPxkKR79sHy/download",
+        unzip_dir="build/unzipped_prebuilt"
     output: directory("build/pre-built")
-    shell: "curl -sLo '2022-02-08.zip' 'https://surfdrive.surf.nl/files/index.php/s/6TDxlPxkKR79sHy/download'; unzip '2022-02-08.zip'; rm -r 2022-02-08.zip; mv 2022-02-08/* .; rm -r 2022-02-08; unzip 2050.zip -d {output}; rm -r 2030.zip 2050.zip"
-
+    shell: "curl -sLo '2022-02-08.zip' 'https://surfdrive.surf.nl/files/index.php/s/6TDxlPxkKR79sHy/download'; \
+            unzip '2022-02-08.zip' -d {params.unzip_dir}; \
+            rm -r 2022-02-08.zip; \
+            unzip {params.unzip_dir}/2022-02-08/2050.zip -d {output}; \
+            rm -r {params.unzip_dir};"
 
 # TODO: this is another build phase, applying overrides
 rule build_eurocalliope:
