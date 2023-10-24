@@ -31,7 +31,7 @@ rule build_eurocalliope:
         scenario = config["scenario"] 
     output: "build/{resolution}/inputs/{year}_{model_resolution}.nc"
     log: LOGS + "build_eurocalliope_{resolution}_{year}_{model_resolution}.log"
-    shell: "python {input.script} -i {input.prebuild}/{params.model_yaml_path} -o {output} --scenario {params.scenario},{wildcards.model_resolution} 2> {log}"
+    shell: "python {input.script} -i {input.prebuild}/{params.model_yaml_path} -o {output} --scenario {params.scenario},{wildcards.model_resolution} 2>&1 | tee {log}"
 
 rule run_eurocalliope:
     message: "Running Calliope {wildcards.resolution} model with {wildcards.model_resolution} hourly temporal resolution for the model year {wildcards.year}"
@@ -43,4 +43,4 @@ rule run_eurocalliope:
     output: "build/{resolution}/outputs/{year}_{model_resolution}.nc"
     log: LOGS + "run_eurocalliope_{resolution}_{year}_{model_resolution}.log"
     # conda: "../envs/calliope.yaml"
-    shell: "python {input.script} -i {input.model} -o {output} 2> {log} 1> {log}"
+    shell: "python {input.script} -i {input.model} -o {output} 2>&1 | tee {log}"
