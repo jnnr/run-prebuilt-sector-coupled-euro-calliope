@@ -1,6 +1,7 @@
 LOGS = "logs/"
 wildcard_constraints:
     year = "2016|2017|2018",
+    model_resolution = "res_3h|res_6h|res_12h|res_24h",
 
 configfile: "config/default.yaml"
 
@@ -28,9 +29,9 @@ rule build_eurocalliope:
         model_yaml_path = "model/{resolution}/model-{year}.yaml",
         # scenario according to https://energysystems-docs.netlify.app/tools/sector-coupled-euro-calliope-hands-on.html
         # "industry_fuel,transport,heat,config_overrides,gas_storage,link_cap_dynamic,freeze-hydro-capacities,add-biofuel,synfuel_transmission,{model_resolution}",
-        scenario = config["scenario"] 
-    output: "build/{resolution}/inputs/{year}_{model_resolution}.nc"
-    log: LOGS + "build_eurocalliope_{resolution}_{year}_{model_resolution}.log"
+        scenario = lambda wildcards: config["scenario"][wildcards.scenario]
+    output: "build/{resolution}/inputs/{year}_{model_resolution}_{scenario}.nc"
+    log: LOGS + "build_eurocalliope_{resolution}_{year}_{model_resolution}_{scenario}.log"
     shell: "python {input.script} -i {input.prebuild}/{params.model_yaml_path} -o {output} --scenario {params.scenario},{wildcards.model_resolution} 2>&1 | tee {log}"
 
 rule run_eurocalliope:
@@ -40,7 +41,7 @@ rule run_eurocalliope:
         model = rules.build_eurocalliope.output[0],
         script = "run_custom.py"
     envmodules: "gurobi/9.0.2"
-    output: "build/{resolution}/outputs/{year}_{model_resolution}.nc"
-    log: LOGS + "run_eurocalliope_{resolution}_{year}_{model_resolution}.log"
+    output: "build/{resolution}/outputs/{year}_{model_resolution}_{scenario}.nc"
+    log: LOGS + "run_eurocalliope_{resolution}_{year}_{model_resolution}_{scenario}.log"
     # conda: "../envs/calliope.yaml"
     shell: "python {input.script} -i {input.model} -o {output} 2>&1 | tee {log}"
